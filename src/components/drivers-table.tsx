@@ -23,9 +23,11 @@ export function DriversTable({ drivers }: DriversTableProps) {
       {
         isDriversEmpty 
           ? (
-            <TableRow>
-              <TableCell className="text-lg py-4 dark:text-zinc-400 text-zinc-500" colSpan={10}>Nenhum motorista encontrado</TableCell>
-            </TableRow>
+            <TableBody>
+              <TableRow>
+                <TableCell className="text-lg py-4 dark:text-zinc-400 text-zinc-500" colSpan={10}>Nenhum motorista encontrado</TableCell>
+              </TableRow>
+            </TableBody>
           )
           : (
             <TableBody>

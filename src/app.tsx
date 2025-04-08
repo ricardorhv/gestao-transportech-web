@@ -21,7 +21,7 @@ export function App() {
   useEffect(() => {
     async function fetchDrivers() {
       try {
-        const response = await fetch("http://localhost:3000/driver")
+        const response = await fetch("https://gestao-transportech-api.onrender.com/driver")
         const data = await response.json()
         setDrivers(data)
       } catch (error) {
