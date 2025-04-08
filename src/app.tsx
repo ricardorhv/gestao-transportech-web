@@ -7,6 +7,7 @@ import { Driver } from "./interfaces/driver";
 export function App() {
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [textFilter, setTextFilter] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const filteredDrivers = drivers.filter(({ name, lastName }) => {
     const fullname = `${name} ${lastName}`
@@ -20,12 +21,15 @@ export function App() {
 
   useEffect(() => {
     async function fetchDrivers() {
+      setIsLoading(true)
       try {
         const response = await fetch("https://gestao-transportech-api.onrender.com/driver")
         const data = await response.json()
         setDrivers(data)
+        setIsLoading(false)
       } catch (error) {
         console.error(`Error to fetch drivers. Error: ${error}`)
+        setIsLoading(false)
       }
     }
 
@@ -51,7 +55,9 @@ export function App() {
           />
         </div>
 
-        <DriversTable drivers={isTextFilterEmpty ? drivers : filteredDrivers} />
+        {
+          isLoading ? <h4 className="text-lg m-4">Carregando...</h4> : <DriversTable drivers={isTextFilterEmpty ? drivers : filteredDrivers} />
+        }
       </main>
     </>
   )
