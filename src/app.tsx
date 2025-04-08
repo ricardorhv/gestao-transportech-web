@@ -1,48 +1,57 @@
-import { Moon, Sun, SunMoon } from "lucide-react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { DriversTable } from "./components/drivers-table";
+import { ThemeSelect } from "./components/theme-select";
 import { Input } from "./components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
-import { useTheme } from "./context/theme-provider";
+import { Driver } from "./interfaces/driver";
 
 export function App() {
-  const { theme, toggleTheme } = useTheme()
+  const [drivers, setDrivers] = useState<Driver[]>([])
+  const [textFilter, setTextFilter] = useState('')
+
+  const filteredDrivers = drivers.filter(({ name, lastName }) => {
+    const fullname = `${name} ${lastName}`
+    return fullname.toLowerCase().includes(textFilter.toLowerCase())
+  })
+  const isTextFilterEmpty = textFilter.trim().length === 0
+
+  function handleFilterDrivers(event: ChangeEvent<HTMLInputElement>) {
+    setTextFilter(event.target.value)
+  }
+
+  useEffect(() => {
+    async function fetchDrivers() {
+      try {
+        const response = await fetch("http://localhost:3000/driver")
+        const data = await response.json()
+        setDrivers(data)
+      } catch (error) {
+        console.error(`Error to fetch drivers. Error: ${error}`)
+      }
+    }
+
+    fetchDrivers()
+  }, [])
 
   return (
     <>
       <header className="flex flex-wrap max-sm:justify-center justify-between gap-4 items-center px-5 py-4 max-w-[1300px] mx-auto">
-        <h2 className="text-2xl dark:text-gray-300 text-zinc-900 font-bold">Gestão<span className="dark:text-indigo-950 text-indigo-700">Transportech</span></h2>
+        <h2 className="text-2xl dark:text-gray-300 text-zinc-900 font-bold">
+          Gestão<span className="text-indigo-800 dark:text-indigo-600">Transportech</span>
+        </h2>
 
-        <Select
-          defaultValue={theme} 
-          onValueChange={toggleTheme}
-        >
-          <SelectTrigger className="focus-visible:ring-0 focus-visible:border-indigo-700 focus-visible:dark:border-indigo-950">
-            <SelectValue placeholder="Escolha um tema"/>
-          </SelectTrigger>
-
-          <SelectContent className="font-poppins">
-            <SelectItem value="system">
-              <SunMoon />
-              Sistema
-            </SelectItem>
-            <SelectItem value="light">
-              <Sun />
-              Claro
-            </SelectItem>
-            <SelectItem value="dark">
-              <Moon />
-              Escuro
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <ThemeSelect />
       </header>
 
-      <main className="max-w-[1300px] mx-auto px-5 mt-12">
+      <main className="max-w-[1300px] mx-auto px-5 my-12">
         <div>
           <Input 
-            className="p-5 focus-visible:ring-0 focus-visible:border-indigo-700 focus-visible:dark:border-indigo-950" 
-            placeholder="Busque por um motorista" 
+            className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800" 
+            placeholder="Busque por um motorista"
+            onChange={handleFilterDrivers}
           />
         </div>
+
+        <DriversTable drivers={isTextFilterEmpty ? drivers : filteredDrivers} />
       </main>
     </>
   )
