@@ -10,7 +10,7 @@ export function ThemeSelect() {
       defaultValue={theme} 
       onValueChange={toggleTheme}
     >
-      <SelectTrigger className="focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800">
+      <SelectTrigger className="focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 ml-auto sm:m-0">
         <SelectValue placeholder="Escolha um tema"/>
       </SelectTrigger>
 

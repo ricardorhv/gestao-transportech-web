@@ -1,6 +1,8 @@
 import { Driver } from "@/interfaces/driver";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
+import { format } from 'date-fns';
+
 interface DriversTableProps {
   drivers: Driver[]
 }
@@ -32,15 +34,19 @@ export function DriversTable({ drivers }: DriversTableProps) {
           : (
             <TableBody>
               {
-                drivers.map(({id, name, lastName, document, email, isActive, createdAt}) => (
-                  <TableRow key={id}>
-                    <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{name} {lastName}</TableCell>
-                    <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{document}</TableCell>
-                    <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{email}</TableCell>
-                    <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{isActive ? 'Ativo' : 'Inativo'}</TableCell>
-                    <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{String(createdAt)}</TableCell>
-                  </TableRow>
-                ))
+                drivers.map(({id, name, lastName, document, email, isActive, createdAt}) => {
+                  const formattedDate = format(new Date(createdAt), "dd/MM/yyyy")
+
+                  return (
+                    <TableRow key={id}>
+                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{name} {lastName}</TableCell>
+                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{document}</TableCell>
+                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{email}</TableCell>
+                      <TableCell className={`py-4 dark:text-zinc-400 text-zinc-500 ${isActive ? 'text-emerald-500 dark:text-emerald-500' : 'text-red-500 dark:text-red-500'}`}>{isActive ? 'Ativo' : 'Inativo'}</TableCell>
+                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{String(formattedDate)}</TableCell>
+                    </TableRow>
+                  )
+                })
               }
             </TableBody>
           )
