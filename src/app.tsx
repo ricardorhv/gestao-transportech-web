@@ -40,7 +40,7 @@ export function App() {
 
   return (
     <>
-      <header className="flex flex-col sm:flex-row justify-between gap-4 items-center px-5 py-4 max-w-[1300px] mx-auto">
+      <header className="flex flex-col sm:flex-row justify-between gap-4 items-center px-5 py-8 max-w-[1300px] mx-auto">
         <h2 className="text-2xl dark:text-gray-300 text-zinc-900 font-bold">
           Gestão<span className="text-indigo-800 dark:text-indigo-600">Transportech</span>
         </h2>

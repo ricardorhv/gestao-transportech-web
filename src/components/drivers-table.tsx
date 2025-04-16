@@ -2,6 +2,8 @@ import { Driver } from "@/interfaces/driver";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 import { format } from 'date-fns';
+import { EditUserDialog } from "./edit-user-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 
 interface DriversTableProps {
   drivers: Driver[]
@@ -34,17 +36,32 @@ export function DriversTable({ drivers }: DriversTableProps) {
           : (
             <TableBody>
               {
-                drivers.map(({id, name, lastName, document, email, isActive, createdAt}) => {
+                drivers.map((driver) => {
+                  const {id, name, lastName, document, email, isActive, createdAt} = driver
                   const formattedDate = format(new Date(createdAt), "dd/MM/yyyy")
 
                   return (
-                    <TableRow key={id}>
-                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{name} {lastName}</TableCell>
-                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{document}</TableCell>
-                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{email}</TableCell>
-                      <TableCell className={`py-4 dark:text-zinc-400 text-zinc-500 ${isActive ? 'text-emerald-500 dark:text-emerald-500' : 'text-red-500 dark:text-red-500'}`}>{isActive ? 'Ativo' : 'Inativo'}</TableCell>
-                      <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{String(formattedDate)}</TableCell>
-                    </TableRow>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                      <TableRow className="cursor-pointer" key={id}>
+                        <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{name} {lastName}</TableCell>
+                        <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{document}</TableCell>
+                        <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{email}</TableCell>
+                        <TableCell className={`py-4 dark:text-zinc-400 text-zinc-500 ${isActive ? 'text-emerald-500 dark:text-emerald-500' : 'text-red-500 dark:text-red-500'}`}>{isActive ? 'Ativo' : 'Inativo'}</TableCell>
+                        <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{String(formattedDate)}</TableCell>
+                      </TableRow>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Editar motorista</DialogTitle>
+                          <DialogDescription>
+                          Edite as informações do motorista selecionado.
+                          </DialogDescription>
+                        </DialogHeader>
+                
+                        <EditUserDialog driver={driver}  />
+                      </DialogContent>
+                    </Dialog>
                   )
                 })
               }
