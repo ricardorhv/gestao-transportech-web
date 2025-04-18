@@ -10,7 +10,7 @@ export function AddNewUserDialog() {
         <PlusCircleIcon size={20} />
         Novo motorista
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>Cadastrar motorista</DialogTitle>
           <DialogDescription>

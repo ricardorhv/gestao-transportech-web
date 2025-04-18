@@ -122,3 +122,18 @@
     @apply font-poppins;
   }
 }
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    @apply w-1.5 scroll-pl-0.5; /* Largura da barra de rolagem */
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent rounded-full mx-2; /* Fundo da trilha */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply dark:bg-white/30 bg-gray-300 rounded-full; /* Cor do polegar */
+  }
+}
+

@@ -43,7 +43,7 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
 
   return (
     <Form {...form}>
-      <form className="space-y-4">
+      <form className="space-y-4 max-h-[80vh] overflow-y-auto px-1">
         <FormField
           control={form.control}
           name="name"
@@ -136,10 +136,22 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
           )}
         />
 
-        <div className="flex flex-col gap-2">
-          <Label className="font-normal text-zinc-800 dark:text-zinc-400">Ativar motorista</Label>
-          <Switch defaultChecked={isActive} />
-        </div>
+        <FormField
+          control={form.control}
+          name="isActive"
+          defaultValue={isActive}
+          render={({ field: { value, ...props } }) => (
+            <FormItem>
+              <FormControl>
+              <div className="flex flex-col gap-2">
+                <Label className="font-normal text-zinc-800 dark:text-zinc-400">Ativar motorista</Label>
+                <Switch defaultChecked={isActive} value={`${value}`} {...props} />
+              </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button className="w-full mt-8 bg-indigo-800 dark:bg-indigo-600 text-white hover:brightness-90 transition rounded-md flex items-center justify-center px-3 py-2 text-sm">Salvar</Button>
       </form>
