@@ -9,14 +9,49 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 
 const newUserSchema = z.object({
-  name: z.string(),
-  lastName: z.string(),
-  driverLicense: z.string(),
-  document: z.string(),
-  phone: z.string(),
-  isActive: z.boolean(),
-  email: z.string(),
-  password: z.string(),
+  name: z.string({
+    message: 'Este campo é obrigatório!'
+  }),
+  lastName: z.string({
+    message: 'Este campo é obrigatório!'
+  }),
+  driverLicense: z.string({
+    message: 'Este campo é obrigatório!'
+  }).min(11, {
+    message: 'Formato inválido!'
+  }),
+  document: z.string({
+    message: 'Este campo é obrigatório!'
+  }).refine((value) => {
+    const formattedValue = value.replace(/[^\d]+/g, "")
+    const isCpf = formattedValue.length === 11
+    const isCnpj = formattedValue.length === 14
+
+    return isCpf || isCnpj
+  }, {
+    message: 'Formato inválido!'
+  }),
+  phone: z.string({
+    message: 'Este campo é obrigatório!'
+  }).refine((value) => {
+    const formattedValue = value.replace(/[^\d]+/g, "")
+    const isPhoneNumber = formattedValue.length === 11
+
+    return isPhoneNumber
+  }, {
+    message: 'Formato inválido!'
+  }),
+  isActive: z.boolean({
+    message: 'Este campo é obrigatório!'
+  }),
+  email: z.string({
+    message: 'Este campo é obrigatório!'
+  }),
+  password: z.string({
+    message: 'Este campo é obrigatório!'
+  }).min(6, {
+    message: 'É necessário no mínimo 6 caracteres!'
+  }),
 })
 
 type EditUserType = z.infer<typeof newUserSchema>

@@ -2,8 +2,11 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 
+import { Driver } from "@/interfaces/driver";
+import { api } from "@/lib/api";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from 'zod';
 import { LoadingIndicator } from "./loading-indicator";
 import { Button } from "./ui/button";
@@ -19,12 +22,29 @@ const newUserSchema = z.object({
   }),
   driverLicense: z.string({
     message: 'Este campo é obrigatório!'
+  }).min(11, {
+    message: 'Formato inválido!'
   }),
   document: z.string({
     message: 'Este campo é obrigatório!'
+  }).refine((value) => {
+    const formattedValue = value.replace(/[^\d]+/g, "")
+    const isCpf = formattedValue.length === 11
+    const isCnpj = formattedValue.length === 14
+
+    return isCpf || isCnpj
+  }, {
+    message: 'Formato inválido!'
   }),
   phone: z.string({
     message: 'Este campo é obrigatório!'
+  }).refine((value) => {
+    const formattedValue = value.replace(/[^\d]+/g, "")
+    const isPhoneNumber = formattedValue.length === 11
+
+    return isPhoneNumber
+  }, {
+    message: 'Formato inválido!'
   }),
   isActive: z.boolean({
     message: 'Este campo é obrigatório!'
@@ -34,20 +54,48 @@ const newUserSchema = z.object({
   }),
   password: z.string({
     message: 'Este campo é obrigatório!'
+  }).min(6, {
+    message: 'É necessário no mínimo 6 caracteres!'
   }),
 })
 
 type NewUserType = z.infer<typeof newUserSchema>
 
-export function AddNewUserForm() {
+interface AddNewUserFormProps {
+  openDialog: (value: boolean) => void;
+  handleAddNewDriver: (driver: Driver) => void;
+}
+
+export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFormProps) {
   const form = useForm<NewUserType>({
     resolver: zodResolver(newUserSchema)
   })
   const { handleSubmit, formState: { isSubmitting } } = form
 
   async function onSubmit(data: NewUserType) {
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    console.log(data);
+    try {
+      const response = await api('/driver', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error()
+      }
+
+      const driver: Driver = await response.json()
+      handleAddNewDriver(driver)
+    } catch(error) {
+      toast.error('Erro ao adicionar o motorista')
+      return
+    }
+
+    openDialog(false)
+
+    toast.success('Motorista adicionado com sucesso')
   }
 
   return (

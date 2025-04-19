@@ -5,6 +5,7 @@ import { SkeletonTable } from "./components/skeleton-table";
 import { ThemeSelect } from "./components/theme-select";
 import { Input } from "./components/ui/input";
 import { Driver } from "./interfaces/driver";
+import { api } from "./lib/api";
 
 export function App() {
   const [drivers, setDrivers] = useState<Driver[]>([])
@@ -21,11 +22,18 @@ export function App() {
     setTextFilter(event.target.value)
   }
 
+  function handleAddNewDriver(driver: Driver) {
+    setDrivers((prevState) => [
+      driver,
+      ...prevState
+    ])
+  }
+
   useEffect(() => {
     async function fetchDrivers() {
       setIsLoading(true)
       try {
-        const response = await fetch("https://gestao-transportech-api.onrender.com/driver")
+        const response = await api('/driver')
         const data = await response.json()
         setDrivers(data)
         setIsLoading(false)
@@ -56,7 +64,7 @@ export function App() {
             onChange={handleFilterDrivers}
           />
 
-          <AddNewUserDialog />
+          <AddNewUserDialog handleAddNewDriver={handleAddNewDriver} />
         </div>
 
         {
