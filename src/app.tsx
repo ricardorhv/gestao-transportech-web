@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { AddNewUserDialog } from "./components/add-new-user-dialog";
+import { AddNewDriverDialog } from "./components/add-new-driver-dialog";
 import { DriversTable } from "./components/drivers-table";
 import { SkeletonTable } from "./components/skeleton-table";
 import { ThemeSelect } from "./components/theme-select";
@@ -27,6 +27,22 @@ export function App() {
       driver,
       ...prevState
     ])
+  }
+
+  function handleEditDriver(driver: Driver) {
+    setDrivers((prevState) => prevState.map((prevDriver) => {
+      if (prevDriver.id === driver.id) {
+        return {
+          ...driver
+        }
+      }
+
+      return prevDriver
+    }))
+  }
+
+  function handleDeleteDriver(driverId: string) {
+    setDrivers((prevState) => prevState.filter(({ id }) => id !== driverId))
   }
 
   useEffect(() => {
@@ -64,11 +80,17 @@ export function App() {
             onChange={handleFilterDrivers}
           />
 
-          <AddNewUserDialog handleAddNewDriver={handleAddNewDriver} />
+           <AddNewDriverDialog handleAddNewDriver={handleAddNewDriver} />
         </div>
 
         {
-          isLoading ? <SkeletonTable /> : <DriversTable drivers={isTextFilterEmpty ? drivers : filteredDrivers} />
+          isLoading 
+            ? <SkeletonTable /> 
+            : <DriversTable 
+                drivers={isTextFilterEmpty ? drivers : filteredDrivers} 
+                handleEditDriver={handleEditDriver}
+                handleDeleteDriver={handleDeleteDriver}
+              />
         }
       </main>
     </>

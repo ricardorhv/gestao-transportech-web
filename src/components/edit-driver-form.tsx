@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 
@@ -59,23 +58,25 @@ const newUserSchema = z.object({
   }),
 })
 
-type NewUserType = z.infer<typeof newUserSchema>
+type EditDriverType = z.infer<typeof newUserSchema>
 
-interface AddNewUserFormProps {
+interface EditDriverFormProps {
+  driver: Driver
   openDialog: (value: boolean) => void;
-  handleAddNewDriver: (driver: Driver) => void;
+  onEditDriver: (driver: Driver) => void;
 }
 
-export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFormProps) {
-  const form = useForm<NewUserType>({
+export function EditDriverForm({ driver, openDialog, onEditDriver }: EditDriverFormProps) {
+  const form = useForm<EditDriverType>({
     resolver: zodResolver(newUserSchema)
   })
-  const { handleSubmit, formState: { isSubmitting } } = form
 
-  async function onSubmit(data: NewUserType) {
+  const { handleSubmit, formState: { isSubmitting } } = form
+  
+  async function onSubmit(data: EditDriverType) {
     try {
-      const response = await api('/driver', {
-        method: 'POST',
+      const response = await api(`/driver/${driver.id}`, {
+        method: 'PATCH',
         body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json'
@@ -86,31 +87,40 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         throw new Error()
       }
 
-      const driver: Driver = await response.json()
-      handleAddNewDriver(driver)
-    } catch(error) {
-      toast.error('Erro ao adicionar o motorista')
+      const updatedDriver: Driver = await response.json()
+      onEditDriver(updatedDriver)
+    } catch {
+      toast.error('Erro ao alterar o motorista')
       return
     }
 
     openDialog(false)
 
-    toast.success('Motorista adicionado com sucesso')
+    toast.success('Motorista alterado com sucesso')
   }
 
+  const { 
+    document,
+    driverLicense,
+    email,
+    isActive,
+    lastName,
+    name,
+    password,
+    phone
+   } = driver
+   
   return (
     <Form {...form}>
-      <form className="space-y-4 max-h-[80vh] overflow-y-auto px-1" onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-h-[80vh] overflow-y-auto px-1">
         <FormField
           control={form.control}
           name="name"
-          rules={{
-            required: true
-          }}
-          render={({ field: { value, ...props } }) => (
+          defaultValue={name}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Nome" {...props} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Nome" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -119,10 +129,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="lastName"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={lastName}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Sobrenome" {...props} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Sobrenome" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,10 +142,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="document"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={document}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Documento" {...props} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Documento" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -143,10 +155,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="driverLicense"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={driverLicense}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Carteira de motorista" {...props} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Carteira de motorista" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -155,10 +168,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="phone"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={phone}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="tel" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Telefone" {...props} />
+                <Input type="tel" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Telefone" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -167,10 +181,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="email"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={email}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="email" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Email" {...props} />
+                <Input type="email" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -179,10 +194,11 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="password"
-          render={({ field: { value, ...props } }) => (
+          defaultValue={password}
+          render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="password" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Senha" {...props} />
+                <Input type="password" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Senha" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -192,13 +208,13 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         <FormField
           control={form.control}
           name="isActive"
-          defaultValue={false}
-          render={({ field: { value, ...props } }) => (
+          defaultValue={isActive}
+          render={({ field: { value, onChange }}) => (
             <FormItem>
               <FormControl>
               <div className="flex flex-col gap-2">
                 <Label className="font-normal text-zinc-800 dark:text-zinc-400">Ativar motorista</Label>
-                <Switch value={`${value}`} {...props} />
+                <Switch defaultChecked={isActive} checked={value} onCheckedChange={onChange} />
               </div>
               </FormControl>
               <FormMessage />
@@ -207,7 +223,7 @@ export function AddNewUserForm({ openDialog, handleAddNewDriver }: AddNewUserFor
         />
 
         <Button className="w-full mt-8 bg-indigo-800 dark:bg-indigo-600 text-white hover:brightness-90 transition rounded-md flex items-center justify-center px-3 py-2 text-sm">
-          {isSubmitting ? <LoadingIndicator /> : 'Cadastrar'}
+          {isSubmitting ? <LoadingIndicator /> : 'Salvar'}
         </Button>
       </form>
     </Form>

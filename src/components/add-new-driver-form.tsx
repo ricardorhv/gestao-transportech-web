@@ -1,14 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 
+import { Driver } from "@/interfaces/driver";
+import { api } from "@/lib/api";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from 'zod';
+import { LoadingIndicator } from "./loading-indicator";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 
-const newUserSchema = z.object({
+const newDriverSchema = z.object({
   name: z.string({
     message: 'Este campo é obrigatório!'
   }),
@@ -54,39 +59,58 @@ const newUserSchema = z.object({
   }),
 })
 
-type EditUserType = z.infer<typeof newUserSchema>
+type NewDriverType = z.infer<typeof newDriverSchema>
 
-interface EditUserDialogProps {
-  driver: EditUserType
+interface AddNewDriverFormProps {
+  openDialog: (value: boolean) => void;
+  handleAddNewDriver: (driver: Driver) => void;
 }
 
-export function EditUserDialog({ driver }: EditUserDialogProps) {
-  const form = useForm<EditUserType>({
-    resolver: zodResolver(newUserSchema)
+export function AddNewDriverForm({ openDialog, handleAddNewDriver }: AddNewDriverFormProps) {
+  const form = useForm<NewDriverType>({
+    resolver: zodResolver(newDriverSchema)
   })
+  const { handleSubmit, formState: { isSubmitting } } = form
 
-  const { 
-    document,
-    driverLicense,
-    email,
-    isActive,
-    lastName,
-    name,
-    password,
-    phone
-   } = driver
+  async function onSubmit(data: NewDriverType) {
+    try {
+      const response = await api('/driver', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error()
+      }
+
+      const driver: Driver = await response.json()
+      handleAddNewDriver(driver)
+    } catch(error) {
+      toast.error('Erro ao adicionar o motorista')
+      return
+    }
+
+    openDialog(false)
+
+    toast.success('Motorista adicionado com sucesso')
+  }
 
   return (
     <Form {...form}>
-      <form className="space-y-4 max-h-[80vh] overflow-y-auto px-1">
+      <form className="space-y-4 max-h-[80vh] overflow-y-auto px-1" onSubmit={handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="name"
-          defaultValue={name}
-          render={({ field }) => (
+          rules={{
+            required: true
+          }}
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Nome" {...field} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Nome" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,11 +119,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="lastName"
-          defaultValue={lastName}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Sobrenome" {...field} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Sobrenome" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,11 +131,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="document"
-          defaultValue={document}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Documento" {...field} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Documento" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,11 +143,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="driverLicense"
-          defaultValue={driverLicense}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Carteira de motorista" {...field} />
+                <Input className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Carteira de motorista" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,11 +155,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="phone"
-          defaultValue={phone}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input type="tel" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Telefone" {...field} />
+                <Input type="tel" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Telefone" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -147,11 +167,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="email"
-          defaultValue={email}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input type="email" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Email" {...field} />
+                <Input type="email" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Email" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -160,11 +179,10 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="password"
-          defaultValue={password}
-          render={({ field }) => (
+          render={({ field: { value, ...props } }) => (
             <FormItem>
               <FormControl>
-                <Input type="password" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Senha" {...field} />
+                <Input type="password" className="p-5 focus-visible:ring-0 focus-visible:dark:border-indigo-600 focus-visible:border-indigo-800 text-sm" placeholder="Senha" {...props} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -174,13 +192,13 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
         <FormField
           control={form.control}
           name="isActive"
-          defaultValue={isActive}
-          render={({ field: { value, ...props } }) => (
+          defaultValue={false}
+          render={({ field: { value, onChange } }) => (
             <FormItem>
               <FormControl>
               <div className="flex flex-col gap-2">
                 <Label className="font-normal text-zinc-800 dark:text-zinc-400">Ativar motorista</Label>
-                <Switch defaultChecked={isActive} value={`${value}`} {...props} />
+                <Switch checked={value} onCheckedChange={onChange} />
               </div>
               </FormControl>
               <FormMessage />
@@ -188,7 +206,9 @@ export function EditUserDialog({ driver }: EditUserDialogProps) {
           )}
         />
 
-        <Button className="w-full mt-8 bg-indigo-800 dark:bg-indigo-600 text-white hover:brightness-90 transition rounded-md flex items-center justify-center px-3 py-2 text-sm">Salvar</Button>
+        <Button className="w-full mt-8 bg-indigo-800 dark:bg-indigo-600 text-white hover:brightness-90 transition rounded-md flex items-center justify-center px-3 py-2 text-sm">
+          {isSubmitting ? <LoadingIndicator /> : 'Cadastrar'}
+        </Button>
       </form>
     </Form>
   )

@@ -3,13 +3,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 
 import { Driver } from "@/interfaces/driver";
 import { useState } from "react";
-import { AddNewUserForm } from "./add-new-user-form";
+import { AddNewDriverForm } from "./add-new-driver-form";
 
 interface AddNewUserDialogProps {
   handleAddNewDriver: (driver: Driver) => void
 }
 
-export function AddNewUserDialog({ handleAddNewDriver }: AddNewUserDialogProps) {
+export function AddNewDriverDialog({ handleAddNewDriver }: AddNewUserDialogProps) {
   const [isNewUserDialogOpened, setIsNewUserDialogOpened] = useState(false)
 
   function handleOpenDialog(value: boolean) {
@@ -30,7 +30,7 @@ export function AddNewUserDialog({ handleAddNewDriver }: AddNewUserDialogProps) 
           </DialogDescription>
         </DialogHeader>
 
-        <AddNewUserForm openDialog={handleOpenDialog} handleAddNewDriver={handleAddNewDriver} />
+        <AddNewDriverForm openDialog={handleOpenDialog} handleAddNewDriver={handleAddNewDriver} />
       </DialogContent>
   </Dialog>
   )

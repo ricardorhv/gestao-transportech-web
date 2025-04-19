@@ -2,14 +2,16 @@ import { Driver } from "@/interfaces/driver";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 import { format } from 'date-fns';
-import { DeleteUserDialog } from "./delete-user-dialog";
+import { DeleteDriverDialog } from "./delete-driver-dialog";
 import { EditDriverDialog } from "./edit-driver-dialog";
 
 interface DriversTableProps {
   drivers: Driver[]
+  handleEditDriver: (driver: Driver) => void
+  handleDeleteDriver: (driverId: string) => void
 }
 
-export function DriversTable({ drivers }: DriversTableProps) {
+export function DriversTable({ drivers, handleEditDriver, handleDeleteDriver }: DriversTableProps) {
   const isDriversEmpty = drivers.length === 0
 
   return (
@@ -49,8 +51,8 @@ export function DriversTable({ drivers }: DriversTableProps) {
                       <TableCell className={`py-4 dark:text-zinc-400 text-zinc-500 ${isActive ? 'text-emerald-500 dark:text-emerald-500' : 'text-red-500 dark:text-red-500'}`}>{isActive ? 'Ativo' : 'Inativo'}</TableCell>
                       <TableCell className="py-4 dark:text-zinc-400 text-zinc-500">{String(formattedDate)}</TableCell>
                       <TableCell className="py-4 dark:text-zinc-400 text-zinc-500 flex items-center gap-2">
-                        <EditDriverDialog driver={driver} />
-                        <DeleteUserDialog />
+                        <EditDriverDialog handleEditDriver={handleEditDriver} driver={driver} />
+                        <DeleteDriverDialog driverId={driver.id} onDeleteDriver={handleDeleteDriver} />
                       </TableCell>
                     </TableRow>
                   )
